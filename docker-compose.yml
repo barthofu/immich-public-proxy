@@ -1,14 +1,13 @@
 services:
   immich-public-proxy:
-    image: alangrainger/immich-public-proxy:latest
+    # image: alangrainger/immich-public-proxy:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: immich-public-proxy
     restart: always
     ports:
       - "3000:3000"
     environment:
-      PUBLIC_BASE_URL: https://your-proxy-url.com
-      IMMICH_URL: http://your-internal-immich-server:2283
-    healthcheck:
-      test: curl -s http://localhost:3000/share/healthcheck -o /dev/null || exit 1
-      start_period: 10s
-      timeout: 5s
+      PUBLIC_BASE_URL: http://localhost:3000
+      IMMICH_URL: https://photos.home.bartho.dev
