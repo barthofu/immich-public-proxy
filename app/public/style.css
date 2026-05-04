@@ -93,7 +93,7 @@ html, body {
 #lightgallery {
     display: flex;
     flex-wrap: wrap;
-    gap: 2px;
+    gap: 10px;
     padding: 12px 40px 40px;
 }
 
@@ -114,7 +114,8 @@ html, body {
 
 #lightgallery img {
     height: 240px;
-    margin-right: 1em;
+    /* margin-right: 1em;
+    margin-bottom: 1em; */
     width: auto;
     display: block;
     object-fit: cover;
