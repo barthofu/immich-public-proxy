@@ -1,7 +1,7 @@
 import immich from './immich'
 import { Response } from 'express-serve-static-core'
 import { Asset, AssetType, ImageSize, IncomingShareRequest, SharedLink } from './types'
-import { canDownload, escapeHtml, getConfigOption } from './functions'
+import { canDownload, canUpload, escapeHtml, getConfigOption } from './functions'
 import archiver from 'archiver'
 import { respondToInvalidRequest } from './invalidRequestHandler'
 import { sanitize } from './includes/sanitize'
@@ -161,7 +161,9 @@ class Render {
       description: getConfigOption('ipp.showGalleryDescription', false) ? this.description(share) : '',
       publicBaseUrl,
       path: '/share/' + share.key,
+      shareKey: share.key,
       showDownload: canDownload(share),
+      showUpload: canUpload(share),
       showTitle: getConfigOption('ipp.showGalleryTitle', false),
       lgConfig: getConfigOption('lightGallery', {})
     })

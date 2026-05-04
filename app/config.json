@@ -16,7 +16,8 @@
     "showMetadata": {
       "description": false
     },
-    "customInvalidResponse": false
+    "customInvalidResponse": false,
+    "allowUpload": true
   },
   "lightGallery": {
     "controls": true,

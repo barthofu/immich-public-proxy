@@ -8,7 +8,7 @@ import render from './render'
 import dayjs from 'dayjs'
 import { NextFunction, Request, Response } from 'express-serve-static-core'
 import { Asset, AssetType, ImageSize, KeyType } from './types'
-import { addResponseHeaders, getConfigOption, toString } from './functions'
+import { addResponseHeaders, canUpload, getConfigOption, log, toString } from './functions'
 import { decrypt, encrypt } from './encrypt'
 import { respondToInvalidRequest } from './invalidRequestHandler'
 
@@ -108,6 +108,72 @@ app.post('/share/unlock', async (req, res) => {
     }))
   }
   res.send()
+})
+
+/*
+ * [ROUTE] Upload files to a shared album (when allowUpload is enabled on the share link)
+ */
+app.post('/share/upload/:key', decodeCookie, async (req, res) => {
+  addResponseHeaders(res)
+
+  if (!immich.isKey(req.params.key)) {
+    req.resume()
+    res.status(400).json({ error: 'Invalid key format' })
+    return
+  }
+
+  if (!getConfigOption('ipp.allowUpload', true)) {
+    req.resume()
+    res.status(403).json({ error: 'Upload is disabled' })
+    return
+  }
+
+  const contentType = req.headers['content-type'] || ''
+  if (!contentType.startsWith('multipart/form-data')) {
+    req.resume()
+    res.status(400).json({ error: 'Expected multipart/form-data' })
+    return
+  }
+
+  const shareRes = await immich.getShareByKey(req.params.key, req.password)
+  if (!shareRes.valid) {
+    req.resume()
+    res.status(404).json({ error: 'Invalid share link' })
+    return
+  }
+  if (shareRes.passwordRequired && !req.password) {
+    req.resume()
+    res.status(401).json({ error: 'Password required' })
+    return
+  }
+  if (!shareRes.link || !canUpload(shareRes.link)) {
+    req.resume()
+    res.status(403).json({ error: 'This share link does not allow uploads' })
+    return
+  }
+
+  const url = immich.buildUrl(immich.apiUrl() + '/assets', { key: req.params.key })
+  try {
+    const bodyStream = new ReadableStream({
+      start (controller) {
+        req.on('data', chunk => controller.enqueue(chunk))
+        req.on('end', () => controller.close())
+        req.on('error', err => controller.error(err))
+      }
+    })
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': contentType },
+      body: bodyStream,
+      // @ts-ignore - duplex required for streaming request bodies in Node.js fetch
+      duplex: 'half'
+    })
+    const result = await response.json()
+    res.status(response.status).json(result)
+  } catch (e) {
+    log('Upload error: ' + e)
+    res.status(500).json({ error: 'Upload failed' })
+  }
 })
 
 /*

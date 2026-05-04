@@ -94,6 +94,45 @@ html {
     margin: auto 4px auto auto;
 }
 
+#upload-btn-container {
+    margin: auto 4px auto 0;
+}
+
+#upload-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+#upload-status-bar {
+    font-family: system-ui, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, Helvetica, Arial, "Helvetica Neue", sans-serif;
+    color: #ccc;
+    font-size: 13px;
+    padding: 4px 6px;
+}
+
+#upload-drop-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.65);
+    color: white;
+    font-family: system-ui, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, Helvetica, Arial, "Helvetica Neue", sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+#upload-drop-overlay.active {
+    display: flex;
+}
+
 #loading-spinner {
     text-align: center;
     margin: 75px 0;
