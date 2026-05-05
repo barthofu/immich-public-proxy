@@ -25,7 +25,7 @@ const app = express()
 app.use(cookieSession({
   name: 'session',
   httpOnly: true,
-  sameSite: 'strict',
+  sameSite: 'lax',
   secret: crypto.randomBytes(32).toString('base64url')
 }))
 // Add the EJS view engine, to render the gallery page
@@ -177,7 +177,7 @@ app.post('/share/upload/:key', decodeCookie, async (req, res) => {
 })
 
 /*
- * [ROUTE] Catch accidental POST requests to share URLs (e.g. from browser history 
+ * [ROUTE] Catch accidental POST requests to share URLs (e.g. from browser history
  * state issues) and force a clean GET redirect.
  * See https://github.com/alangrainger/immich-public-proxy/pull/205
  */
